@@ -1,2 +1,2 @@
 # CSE-4301-Project
-A FPS game coded with C++ using Unreal Engine.
+A Student Information Management System using C++.
