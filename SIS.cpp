@@ -8,8 +8,8 @@
 #include<windows.h>
 #define FILE_NOT_FOUND -1;
 #define USER_NOT_FOUND -2;
-#define SUCCESS 2;
-#difine ADM_PASS "DUNNO"
+//#define SUCCESS 2;
+#difine ADM_PASS "IUT"
 using namespace std;
 
 inline void clrscr(){
