@@ -120,6 +120,9 @@ class admin:public staff{
 
 public:
      char password[10];
+     admin(){
+        staff_id[0]=staff_name[0]=email[0]=password[0]='\0';
+     }
      admin(char *_id,char *_pass,char *_name,char *_email){
             strcpy(staff_id,_id);
             strcpy(password,_pass);
@@ -141,7 +144,7 @@ public:
     void showProfile();
     int update_teacher_info(char *);
     int update_subject();
-
+    friend int user_admin();
 
 
 };
@@ -321,6 +324,7 @@ int setup(){
 	//admin tempad;
 	cout<<"\t\tEnter your staff ID: ";
 	cin>>_stid;
+	strupr(_stid);
 	fflush(stdin);
 	cout<<endl<<"\t\tEnter your name: ";
 	cin.getline(_stname,50);
@@ -330,6 +334,7 @@ int setup(){
 	fflush(stdin);
 	cout<<endl<<"\t\tEnter a password for you: ";
 	cin>>_stpass;
+	strupr(_stpass);
 	fflush(stdin);
 	admin temp(_stid,_stpass,_stname,_stemail);
     fflush(stdin);
@@ -489,6 +494,59 @@ int user_teacher(){
 
 };
 int user_admin(){
+    char id[10];
+    char pass[15],c;
+	clrscr();
+	title();
+	cout<<"\tLogin type : Administrator"<<endl;
+    cout<<"\n\tEnter admin id           : ";
+	cin>>id;
+	fflush(stdin);
+	strupr(id);
+	 cout<<"\n\tEnter admin password     : ";
+	int i=0;
+    while((c=getch())!=13){ pass[i]=c; i++; cout<<'*';
+	  }
+	pass[i]='\0';
+	strupr(pass);
+	admin ad;
+	 bool flag=false;
+    ifstream readfile("admin_file.bin",ios::binary|ios::in);
+        if(!readfile.is_open()){
+            cout<<"\nError opening the record... please try again."<<endl;
+            Sleep(3000);
+			return 0;
+        }
+    readfile.seekg(0);
+    while(!readfile.eof()){
+
+    readfile.read((char*)&ad,sizeof(ad));
+		if(!strcmp(id,ad.staff_id)){
+            flag=true;
+            break;
+		}
+    }
+    if(!flag){
+      cout<<"\n\tNo such Admin found ... ";
+		cin.get();
+		return 0;
+    }
+    readfile.close();
+    char temp_pass[10];
+	strcpy(temp_pass,ad.password);
+	if(strcmp(temp_pass,pass)){
+       cout<<"\r\tAuthentication error..."<<pass<<endl;
+      	cin.get();
+    	exit(0);
+    }
+	while(1){
+         clrscr();
+        title();
+        cout<<"\tLogin type : Administrator  ["<<id<<"]"<<endl;
+        cout<<"\t\tMenu"<<endl;
+        cout<<"_______________________________________________________________________________"<<endl;
+
+	}
 
 };
 int main(){
