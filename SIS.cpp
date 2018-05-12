@@ -117,8 +117,16 @@ public:
 
 };
 class admin:public staff{
-        char password[10];
+
 public:
+     char password[10];
+     admin(char *_id,char *_pass,char *_name,char *_email){
+            strcpy(staff_id,_id);
+            strcpy(password,_pass);
+            strcpy(staff_name,_name);
+            strcpy(email,_email);
+        }
+
     int addstaff();
     int admitStudent();
     int removeStaff(char*);
@@ -169,6 +177,19 @@ public:
     friend class teacher;
     void operator++(int);
 };
+
+void admin::showProfile(){
+	clrscr();
+	title();
+    cout<<" Admin profile...."<<endl;
+	cout<<"_______________________________________________________________________________"<<endl;
+    cout<<" Admin Name      \t :"<<staff_name<<endl;
+    cout<<" Admin Id        \t :"<<staff_id<<endl;
+    cout<<" Email Id        \t :"<<email<<endl;
+	cout<<"_______________________________________________________________________________"<<endl;
+	fflush(stdin);
+	cin.get();
+}
 int student::init(char *u){
     bool flag=false;
     ifstream readfile("student.bin",ios::binary|ios::in);
@@ -287,6 +308,36 @@ int setup(){
 	ofstream _fiii("subject_code.bin",ios::binary|ios::out);
 	if(!_fiii.is_open()) return -1;
 	_fiii.close();
+	ofstream _fiiiad("admin_file.bin",ios::binary|ios::out);
+	if(!_fiiiad.is_open()) return -1;
+	clrscr();
+	title();
+	cout<<"\t\tThis is your first installation "<<endl;
+	cout<<"\t\tSo you have to make an admin ID"<<endl;
+	char _stid[10];
+	char _stname[50];
+	char _stemail[30];
+	char _stpass[10];
+	//admin tempad;
+	cout<<"\t\tEnter your staff ID: ";
+	cin>>_stid;
+	fflush(stdin);
+	cout<<endl<<"\t\tEnter your name: ";
+	cin.getline(_stname,50);
+	fflush(stdin);
+	cout<<endl<<"\t\tEnter your Email address: ";
+	cin>>_stemail;
+	fflush(stdin);
+	cout<<endl<<"\t\tEnter a password for you: ";
+	cin>>_stpass;
+	fflush(stdin);
+	admin temp(_stid,_stpass,_stname,_stemail);
+    fflush(stdin);
+	cout<<"Press enter to proceed "; cin.get();
+	clrscr();
+	temp.showProfile();
+	_fiiiad.write((char*)&temp,sizeof(temp));
+	_fiiiad.close();
 	Sleep(2000);
 	cout<<" : DONE";
 	cin.get();
@@ -438,7 +489,7 @@ int user_teacher(){
 
 };
 int user_admin(){
-    return 0;
+
 };
 int main(){
     setdepartment();
@@ -491,4 +542,3 @@ int main(){
     }
 
 }
-
