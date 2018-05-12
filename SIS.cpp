@@ -12,7 +12,7 @@
 #define SUCCESS 0;
 //#difine ADM_PASS "DUNNO"
 using namespace std;
-int flag;
+int flag,subject=0;
 inline void clrscr(){
     system("cls");
 }
@@ -42,6 +42,7 @@ void setdepartment(){
 
 }
 class student;
+class teacher;
 class staff{
     protected:
         char staff_id[10];
@@ -72,14 +73,15 @@ class staff{
         fflush(stdin);
         cin.get();
         }
+       // friend int teacher::init(char *id);
 };
 class admin;
 class teacher:public staff{
-        char password[10];
         int total_course;
         int course_code[10];
         int dept_id;
 public:
+        char password[10];
         teacher(){
             staff_id[0]=staff_name[0]=email[0]=password[0]='\0';
             total_course=0;
@@ -96,7 +98,7 @@ public:
         void set_subject(){
             printf("Total course teacher id %s:",staff_id);
             scanf("%d",total_course);
-            cout<<endl<<"Input course code(should be consist of 4 digit) "<<endl;
+            cout<<endl<<"Input course code(must be consist of 4 digit) "<<endl;
             for(int i=0;i<total_course;i++){
                 int a;
                 cin>>a;
@@ -220,6 +222,43 @@ char u1[11];
 int student::complaint(){
 
 }
+
+int teacher::init(char *id){
+    bool flag=false;
+    ifstream readfile("staff.bin",ios::binary|ios::in);
+        if(!readfile.is_open()){
+            cerr<<"\nError opening the record... please try again."<<endl;
+            Sleep(3000);
+			return F_NOT_FOUND;
+        }
+    teacher temp;
+    while(!readfile.eof()){
+
+    readfile.read((char*)&temp,sizeof(temp));
+		if(!strcmp(id,temp.staff_id)){
+            flag=true;
+            break;
+		}
+    }
+    if(!flag){
+        cout<<"\nStaff with staff id : ["<<id<<"] not found. Enter valid id"<<endl;
+		Sleep(1000);
+    return USN_NOT_FOUND;
+    }
+    *this=temp;
+     return SUCCESS;
+}
+
+int teacher::manageMarks(){
+
+    return 0;
+}
+
+int teacher::manageAttendence(){
+
+    return 0;
+}
+
 int setup(){
 	title();
 	ifstream fp("student.bin",ios::binary|ios::in);
@@ -279,7 +318,7 @@ int user_student(){
 		return 0;
 	}
 	else if(flag==F_NOT_FOUND){
-		cerr<<"\n\tError in opening file...please try again";
+		cout<<"\n\tError in opening file...please try again";
 					Sleep(2000);
 					return 0;
 	}
@@ -328,7 +367,75 @@ int user_student(){
     }
 };
 int user_teacher(){
-    return 0;
+    char staffid[10];
+	title();
+	cout<<"\tLogin type : Staff"<<endl;
+    fflush(stdin);
+    cout<<endl<<"\tEnter staff id      : ";
+    cin>>staffid;
+    fflush(stdin);
+    cout<<"\tEnter the password  : ";
+    char pass[15],c;
+	short i=0;
+    while((c=getch())!=13){
+			pass[i]=c; i++; cout<<'*';
+		}
+	pass[i]='\0';
+	strupr(pass);
+	strupr(staffid);
+	//int choice;
+	teacher staf;
+	flag=staf.init(staffid);
+	 if(flag == USN_NOT_FOUND){
+		cout<<"\n\tNo such usn assigned to student... ";
+		cin.get();
+		return 0;
+	}
+	else if(flag==F_NOT_FOUND){
+		cout<<"\n\tError in opening file...please try again";
+					Sleep(2000);
+					return 0;
+	}
+    char temp_pass[10];
+	strcpy(temp_pass,staf.password);
+	if(strcmp(temp_pass,pass)){
+       cout<<"\n\tInavlid usn or password..."<<endl;
+       return -1;
+    }
+
+    while(1){
+        clrscr();
+        title();
+        cout<<"\tLogin type : Staff  ["<<staffid<<"]"<<endl;
+        cout<<"\t\tMenu"<<endl;
+        cout<<"\t\t1 : View profile\n\t\t2 : Manage attendence\n\t\t3 : Manage marks\n\t\t4 : Exit"<<endl;
+        cout<<"\n\tEnter your choice  : ";
+        int choice;
+        cin>>choice;
+        switch(choice){
+           case 1 :fflush(stdin);
+                    clrscr();
+                    staf.showProfile();
+		   			break;
+
+           case 2 : fflush(stdin);
+                    clrscr();
+                    staf.manageAttendence();
+                    break;
+
+           case 3 : fflush(stdin);
+                    clrscr();
+                    staf.manageMarks();
+                    break;
+           case 4 : cout<<"Logging out...["<<staffid<<"]";
+		   			Sleep(1000);
+                    return SUCCESS;
+            default : cout<<"Select valid choice : ";
+		  Sleep(1000);
+		         }
+    }
+
+
 };
 int user_admin(){
     return 0;
@@ -384,3 +491,4 @@ int main(){
     }
 
 }
+
