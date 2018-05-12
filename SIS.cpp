@@ -7,12 +7,12 @@
 #include<time.h>
 #include<windows.h>
 #include<string>
-#define FILE_NOT_FOUND -1;
-#define USER_NOT_FOUND -2;
-#define SUCCESS 2;
+#define F_NOT_FOUND -1
+#define USN_NOT_FOUND -2
+#define SUCCESS 0;
 //#difine ADM_PASS "DUNNO"
 using namespace std;
-
+int flag;
 inline void clrscr(){
     system("cls");
 }
@@ -145,6 +145,7 @@ class student{
         int subject_info[10][20];
     }marks,attendence;
 public:
+    char pass[10];
     student(){
         admissionNo=-1;
         strcpy(usn,"\0");
@@ -166,7 +167,59 @@ public:
     friend class teacher;
     void operator++(int);
 };
+int student::init(char *u){
+    bool flag=false;
+    ifstream readfile("student.bin",ios::binary|ios::in);
+     if(!readfile.is_open()){
+              return F_NOT_FOUND;
+    }
+    student temp;
+	readfile.seekg(0);
+	 while(!readfile.eof()){
+        readfile.read((char*)&temp,sizeof(temp));
 
+		if(!strcmp(u,temp.usn)){
+            flag=true;
+            break;
+		}
+		if(temp.admissionNo==-1)
+			break;
+
+    }
+    if(!flag){
+  		return USN_NOT_FOUND;
+    }
+    *this=temp;
+	return SUCCESS;
+
+}
+
+void student::showProfile(){
+
+}
+
+void student::showMarks(){
+
+}
+
+void student::showAttendence(){
+
+}
+
+int student::Notification(){
+
+    return 0;//change while truly defined
+}
+
+int student::timetable(){
+    return 0;
+}
+
+
+char u1[11];
+int student::complaint(){
+
+}
 int setup(){
 	title();
 	ifstream fp("student.bin",ios::binary|ios::in);
@@ -200,13 +253,84 @@ int setup(){
 	cin.get();
 	return 0;
 }
-int student(){
+int user_student(){
+    static int error;
+    char usn[11];
+	clrscr();
+    title();
+    cout<<"\tLogin type : Student."<<endl;
+	cout<<endl<<"\tEnter your usn number : ";
+    cin>>usn;
+    strupr(usn);
+    cout<<endl<<"\tEnter the password    : ";
+    char pass[15],c;
+    int i=0;
+     while((c=getch())!=13){ pass[i]=c;
+                i++; cout<<'*';
+			}
+	pass[i]='\0';
+	strupr(pass);
+	int choice;
+    student s;
+	flag=s.init(usn);
+    if(flag == USN_NOT_FOUND){
+		cout<<"\n\tNo such usn assigned to student... ";
+		cin.get();
+		return 0;
+	}
+	else if(flag==F_NOT_FOUND){
+		cerr<<"\n\tError in opening file...please try again";
+					Sleep(2000);
+					return 0;
+	}
+	char temp_pass[10];
+	strcpy(temp_pass,s.pass);
+	if(strcmp(temp_pass,pass)){
+       cout<<"\n\tInavlid usn or password..."<<endl;
+       return -1;
+    }
+    while(1) {
+        clrscr();
+		title();
+		cout<<"\tLogin type : Student  ["<<usn<<"]"<<endl;
+       	cout<<"\t\tMenu"<<endl;
+       	cout<<"\t\t1 : View profile\n\t\t2 : View attendence\n\t\t3 : View marks\n\t\t4 : View Notifications \n\t\t5 : Give a Complaint \n\t\t6 : Exit"<<endl;
+       	cout<<"\tEnter your choice  : ";
+       	cin>>choice;
+       	switch(choice){
+           case 1 : fflush(stdin);
+		   			clrscr();
+		   			s.showProfile();
+                    break;
+           case 2 : fflush(stdin);
+                    clrscr();
+		            s.showAttendence();
+                     break;
+           case 3 : fflush(stdin);
+		   			clrscr();
+		   			s.showMarks();
+                    break;
+           case 4 : fflush(stdin);
+		   			clrscr();
+		   			s.Notification();
+                    break;
+           case 5 : fflush(stdin);
+		   			clrscr();
+		   			strcpy(u1,usn);
+		   			s.complaint();
+                    break;
+		   case 6 : cout<<"Logging out...["<<usn<<"]";
+		   			Sleep(1000);
+		   			return SUCCESS;
+            default : cout<<"Select valid choice : ";
+		   		Sleep(1000);
+       }
+    }
+};
+int user_teacher(){
     return 0;
 };
-int teacher(){
-    return 0;
-};
-int admin(){
+int user_admin(){
     return 0;
 };
 int main(){
@@ -230,7 +354,7 @@ int main(){
         switch(your_choice){
             case 1 : error=0;
 					while(error<5) {  //Students are allowed to attemp for maximum 5 times
-					        if(student())
+					        if(user_student())
 							error++;
                   			else break;
 								   }
@@ -240,7 +364,7 @@ int main(){
 					break;
             case 2 :error=0;
 					while(error<5) {
-                            if(teacher())
+                            if(user_teacher())
 							error++;
                   			else break;
 								   }
@@ -248,7 +372,7 @@ int main(){
                         cout<<" Authentication failed...";
                     cin.get();
 					break;
-            case 3 :admin();
+            case 3 :user_admin();
                 	break;
             case 4 :cout<<"Terminating..."; Sleep(1000);
                     exit(0);
