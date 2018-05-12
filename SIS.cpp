@@ -74,11 +74,36 @@ class staff{
         }
 };
 class admin;
-class teachar:public staff{
+class teacher:public staff{
         char password[10];
+        int total_course;
+        int course_code[10];
+        int dept_id;
 public:
         teacher(){
-        
+            staff_id[0]=staff_name[0]=email[0]=password[0]='\0';
+            total_course=0;
+            memset(course_code,0,sizeof(course_code));
+            dept_id=0;
+        }
+        teacher(char *_id,char *_pass,char *_name,char *_email,int _dept_id){
+            strcpy(staff_id,_id);
+            strcpy(password,_pass);
+            strcpy(staff_name,_name);
+            strcpy(email,_email);
+            dept_id=_dept_id;
+        }
+        void set_subject(){
+            printf("Total course teacher id %s:",staff_id);
+            scanf("%d",total_course);
+            cout<<endl<<"Input course code(should be consist of 4 digit) "<<endl;
+            for(int i=0;i<total_course;i++){
+                int a;
+                cin>>a;
+                course_code[i]=a;
+
+            }
+
         }
         char* getid(){
 				return staff_id;
@@ -86,12 +111,60 @@ public:
 		 int init(char*);
          int manageAttendence();
          int manageMarks();
+         friend class admin;
 
 };
 class admin:public staff{
         char password[10];
+public:
+    int addstaff();
+    int admitStudent();
+    int removeStaff(char*);
+    int removeStudent(char*);
+    void viewMarks();
+    void viewAttendence();
+    int manageAttendence();
+    int listStudent();
+    int Notification();
+    int complaint();
+    int timetable();
+    void showProfile();
+    int update_teacher_info(char *);
+    int update_subject();
 
 
+
+};
+class student{
+    int admissionNo;
+    char usn[11];
+    char name[30];
+    char email[30];
+    char dob[11];
+    struct sub{
+        int subject_info[10][20];
+    }marks,attendence;
+public:
+    student(){
+        admissionNo=-1;
+        strcpy(usn,"\0");
+        strcpy(name,"\0");
+        strcpy(email,"\0");
+        strcpy(dob,"\0");
+        memset(marks.subject_info,-1,sizeof(marks.subject_info));
+        memset(attendence.subject_info,0,sizeof(attendence.subject_info));
+    }
+     int init(char*);
+    void showProfile();
+    void showAttendence();
+    void showMarks();
+    int Notification();
+    int complaint();
+    int paper();
+    int timetable();
+    friend class admin;
+    friend class teacher;
+    void operator++(int);
 };
 
 int setup(){
