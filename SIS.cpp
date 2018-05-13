@@ -714,11 +714,34 @@ void student::showAttendence(){
 
 int student::Notification(){
 
-    return 0;//change while truly defined
+    clrscr();
+	char ch;
+
+    ifstream readfile("notification.bin",ios::binary|ios::in);
+    if(!readfile.is_open()){
+              return F_NOT_FOUND;
+    }
+
+	title();
+	cout<<"\n\tNOTIFICATIONS: \n\n";
+	readfile.seekg(0);
+	cout<<"\n ";
+    while(!readfile.eof()){
+    readfile.get(ch);
+    cout<<ch;
+    }
+
+    cout<<"\nPress any key to return...";
+	cin.get();
+	readfile.close();
 }
 
 int student::timetable(){
-    return 0;
+   clrscr();
+	char ch;
+    ifstream readfile1("table.bin",ios::binary|ios::in);
+    if(!readfile1.is_open()){
+              return F_NOT_FOUND;}
 }
 
 
