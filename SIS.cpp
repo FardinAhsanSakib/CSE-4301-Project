@@ -82,6 +82,7 @@ class admin;
 class teacher:public staff{
         int total_course;
         int course_code[10];
+        int class_taken[10];
         int dept_id;
 public:
         char password[10];
@@ -89,6 +90,7 @@ public:
             staff_id[0]=staff_name[0]=email[0]=password[0]='\0';
             total_course=0;
             memset(course_code,0,sizeof(course_code));
+            memset(class_taken,0,sizeof(class_taken));
             dept_id=0;
         }
         teacher(char *_id,char *_pass,char *_name,char *_email,int _dept_id){
@@ -199,7 +201,7 @@ public:
     int timetable();
     friend class admin;
     friend class teacher;
-    void operator++(int);
+    void operator++();
 };
 
 void admin::showProfile(){
@@ -581,6 +583,7 @@ int admin::update_teacher_info(char *u){
         scanf("%d",&temp_c);
         temp.course_code[i]=temp_c;
 	}
+	memset(temp.class_taken,0,sizeof(temp.class_taken));
 	readfile.seekp(pos);
 	readfile.write((char*)&temp,sizeof(temp));
 	fflush(stdin);
@@ -896,14 +899,14 @@ int teacher::manageMarks(){
 	int su;
 	cout<<endl<<"Enter the subject code you want to edit (must be consist of 4 digit) : ";
 	cin>>su;
-	int flag=0;
+	int fg=0;
 	for(int i=0;i<total_course;i++){
         if(course_code[i]==su){
-            flag=1;
+            fg=1;
             break;
         }
 	}
-	if(flag==0){
+	if(fg==0){
         cout<<endl<<"You are not allowed to change marks of this course"<<endl;
         return 0;
 	}
@@ -941,10 +944,74 @@ int teacher::manageMarks(){
 }
 
 int teacher::manageAttendence(){
+    char day[10];
+	clrscr();
+	fflush(stdin);
+	title();
+	getdate(day);
+	student temp;
+	int c=0;
+	fstream readfile("student.bin",ios::binary|ios::in|ios::out);
+    if(!readfile.is_open()){
+		cout<<"Error : Student database file missing...";
+		return F_NOT_FOUND;
+	}
+	int su;
+	int youtake;
+	cout<<endl<<"Enter your subject code which attendance you want to give (must be consist of 4 digit) : ";
+	cin>>su;
+	int fg=0;
+	for(int i=0;i<total_course;i++){
+        if(su==course_code[i]){
+            fg=1;
+            youtake=i;
+            break;
+        }
+	}
+	if(fg==0){
+        cout<<endl<<"Sorry,you are not allowed"<<endl;
+        return 0;
+	}
+	class_taken[youtake]++;
+	subject_no=(int)su%100;
+	su/=100;
+	semester_no=su%10;
+	dept_code=su/10;
+	cout<<endl<<"Now edit the students of students who took the course "<<subject_array[dept_code][semester_no][subject_no] << "from the department " << department[dept_code] <<endl;
+    readfile.seekg(0);
+    while(!readfile.eof()){
+        fflush(stdin);
+        readfile.read((char*)&temp,sizeof(temp));
+          if(temp.dept_id==dept_code && temp.semester==semester_no && temp.marks.subject_info[semester_no][subject_no]!=-1){
+            char ch;
+            cout<<"student ID" << temp.admissionNo <<endl;
+            cout<<"present? (Y/N) "<<endl;
+            fflush(stdin);
+            cin>>ch;
+            fflush(stdin);
+            if(ch=='y' || ch=='Y')
+                ++temp;
 
-    return 0;
+
+          }
+        readfile.seekp((long)readfile.tellg()-sizeof(temp));
+		readfile.write((char*)&temp,sizeof(temp));
+		c++;
+		if(c>15) {
+			clrscr();
+			title();
+    		c=0;
+		}
+		fflush(stdin);
+		cin.get();
+
+    }
+    cout<<" Attendance have been updated succesfully..."; Sleep(3000);
+	return SUCCESS;
 }
-
+void student::operator++(){
+    this->attendence.subject_info[semester_no][subject_no]+=1;
+}
 int setup(){
 	title();
 	ifstream fp("student.bin",ios::binary|ios::in);
@@ -959,7 +1026,7 @@ int setup(){
 	ofstream _ofp("staff.bin",ios::binary|ios::out);
 	if(!_ofp.is_open()) return -1;
 	_ofp.close();
-	ofstream _o("work_date.bin",ios::out);
+	ofstream _o("log.bin",ios::out);
 	_o.close();
 	ofstream _f("notification.bin",ios::binary|ios::out);
 	if(!_f.is_open()) return -1;
