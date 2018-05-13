@@ -13,6 +13,9 @@
 //#difine ADM_PASS "DUNNO"
 using namespace std;
 int flag,subject=0,dept_code=0,semester_no=0;
+
+char subject_info[9][10][20][50];
+
 inline void clrscr(){
     system("cls");
 }
@@ -160,6 +163,7 @@ class student{
     }marks,attendence;
 public:
     int semester;
+    int dept_id;
     char pass[10];
     student(){
         admissionNo=-1;
@@ -170,6 +174,7 @@ public:
         memset(marks.subject_info,-1,sizeof(marks.subject_info));
         memset(attendence.subject_info,0,sizeof(attendence.subject_info));
         semester=0;
+        dept_id=0;
     }
      int init(char*);
     void showProfile();
@@ -196,6 +201,355 @@ void admin::showProfile(){
 	fflush(stdin);
 	cin.get();
 }
+void admin::viewMarks(){
+    char usn[15];
+	clrscr();
+	title();
+	cout<<endl<<"Please enter the student USN : "; cin>>usn;
+	strupr(usn);
+	student s;
+	fflush(stdin);
+	if(s.init(usn)){
+		cout<<" Enter valid USN...";
+		cin.get();
+		return;
+		}
+	s.showMarks();
+}
+
+void admin::viewAttendence(){
+    char u[15];
+	clrscr();
+	title();
+	cout<<"Please enter student USN : "; cin>>u;
+	strupr(u);
+	student s;
+	fflush(stdin);
+	if(s.init(u)){
+		cout<<" Enter valid USN...";
+		cin.get();
+		return;
+	}
+	s.showAttendence();
+}
+
+
+
+int admin::removeStudent(char *u){
+    bool flag=false;
+	long pos;
+    fstream readfile("student.bin",ios::binary|ios::in|ios::out);
+    if(!readfile){
+        cout<<"Error in opening the file...please try again";
+        cin.get();
+		return F_NOT_FOUND;
+     }
+     student temp;
+     while(!readfile.eof()){
+		pos=readfile.tellg(); //replace object with null bytes
+        readfile.read((char*)&temp,sizeof(temp));
+			if(!strcmp(u,temp.usn)){
+            	flag=true;
+            	break;
+        	}
+    }
+    if(!flag){
+        cout<<"\tInvalid user "<<endl;
+        return USN_NOT_FOUND;
+		cin.get();
+    }
+        temp.admissionNo=-1;
+        strcpy(temp.usn,"\0");
+        strcpy(temp.name,"\0");
+        strcpy(temp.email,"\0");
+        strcpy(temp.dob,"\0");
+        memset(temp.marks.subject_info,-1,sizeof(temp.marks.subject_info));
+        memset(temp.attendence.subject_info,0,sizeof(temp.attendence.subject_info));
+        temp.semester=0;
+        temp.dept_id=0;
+        	readfile.seekp(pos);
+	readfile.write((char*)&temp,sizeof(temp));
+	fflush(stdin);
+	cout<<"Student record removed successfully...";
+	cin.get();
+	return SUCCESS;
+
+}
+
+int admin::addTeacher(){
+    char name[40],pass[10],email[30],id[10];
+    int d_id;
+    clrscr();
+	ofstream putf("staff.bin",ios::binary|ios::out|ios::app);
+    if(!putf){
+		cerr<<"Unable to open student record file ";
+		return F_NOT_FOUND;
+	}
+	title();
+	cout<<" Please enter the following fields...[all fields are mandatory]"<<endl;
+	cout<<endl<<"_______________________________________________________________________________"<<endl;
+	cout<<"\n Enter teacher id                            : "; cin>>id;
+	strupr(id);
+	fflush(stdin);
+	cout<<"\n Enter teacher name                          : "; cin.getline(name,30);
+	fflush(stdin);
+	cout<<"\n Enter a password for this teacher           : "; cin>>pass;
+	strupr(pass);
+	fflush(stdin);
+	cout<<"\n Enter the mail id                           : "; cin>>email;
+	cout<<"\n Enter teacher's department code (1.MCE, 2.EEE, 3.TVE, 4.CSE, 5.CEE,6.SWE,7.BTM) : "; cin>>d_id;
+	cout<<endl<<"_______________________________________________________________________________"<<endl;
+	teacher temp(id,pass,name,email,d_id);
+	fflush(stdin);
+	cout<<"Press enter to proceed "; cin.get();
+	clrscr();
+	temp.showProfile();
+	putf.write((char*)&temp,sizeof(temp));
+	putf.close();
+	cout<<endl<<" Staff member added successfully...";
+	cout<< "\nTo allocate Mr."<<name<<" courses, follow the option UPDATE TEACHER INFO from admin panel";
+	cin.get();
+	return SUCCESS;
+
+}
+
+int admin::Notification(){
+    	clrscr();
+	ofstream putf("notification.bin",ios::binary|ios::out|ios::app);
+	if(!putf){
+		cerr<<"Unable to open student record file ";
+		return F_NOT_FOUND;
+	}
+	title();
+	char today[11],note[500];
+	getdate(today);
+	 cout<<"\t\t\t\t\t\t\t    Today : "<<today;
+	cout<<"\nEnter Notifications: \n";
+	fflush(stdin);
+	cin.getline(note,500);
+    putf<<"\n_________________________________________________________________   "<<today<<"\n"<<note<<"\n\n\n";
+	putf.close();
+	cout<<endl<<" Notification added successfully..."; cin.get();
+
+}
+
+int admin::complaint(){
+    clrscr();
+	char ch;
+	cout<<"\n\tCOMPLAINT:\n\n";
+    ifstream readfile1("complaint.bin",ios::binary|ios::in);
+    if(!readfile1.is_open()){
+              return F_NOT_FOUND;
+    }
+	fflush(stdin);
+	title();
+	readfile1.seekg(0);
+	cout<<"\n ";
+	 while(!readfile1.eof()){
+    readfile1.get(ch);
+    cout<<ch;
+    }
+    cout<<"\nPress any key to return...";
+	cin.get();
+	readfile1.close();
+}
+
+int admin::timetable(){
+    clrscr();
+	ofstream pf("table.bin",ios::binary|ios::out);
+	if(!pf){
+		cerr<<"Unable to open student record file ";
+		return F_NOT_FOUND;
+	}
+	title();
+	char today[11],note[20],start[10],end[10];
+	getdate(today);
+	 cout<<"\t\t\t\t\t\t\t    Today : "<<today;
+	cout<<"\nEnter exam starting and ending time: \n";
+	cin>>start>>end;
+	fflush(stdin);
+	pf<<"\n\n_______________________________________________________________     "<<today<<"\n\n\n";
+	cout<<"Enter exam date for following subject :\n";
+	   pf<<'|'<<" SUBJECT   "<<'|'<<"\t"<<"DATE     "<<'|'<<"\t"<<"START TIME "<<'|'<<"\t"<<"END TIME "<<" "<<'|'<<endl;
+    cout<<"OOP     : ";
+	cin>>note;
+	   pf<<'|'<<"       OOP "<<'|'<<"\t"<<note<<" "<<'|'<<"\t"<<start<<"      "<<'|'<<"\t"<<end<<"     "<<'|'<<endl;
+    cout<<"MATHS   : ";
+    cin>>note;
+       pf<<'|'<<"     MATHS "<<'|'<<"\t"<<note<<" "<<'|'<<"\t"<<start<<"      "<<'|'<<"\t"<<end<<"     "<<'|'<<endl;
+    cout<<"CO      : ";
+    cin>>note;
+       pf<<'|'<<"        CO "<<'|'<<"\t"<<note<<" "<<'|'<<"\t"<<start<<"      "<<'|'<<"\t"<<end<<"     "<<'|'<<endl;
+    cout<<"MP      : ";
+    cin>>note;
+       pf<<'|'<<"        MP "<<'|'<<"\t"<<note<<" "<<'|'<<"\t"<<start<<"      "<<'|'<<"\t"<<end<<"     "<<'|'<<endl;
+
+	pf.close();
+	cout<<endl<<" Exam time table updated successfully..."; cin.get();
+	cin.get();
+}
+
+int admin::removeTeacher(char *u){
+    bool flag=false;
+	long pos;
+    fstream readfile("staff.bin",ios::binary|ios::in|ios::out);
+	if(!readfile){
+        cerr<<"Error in opening file...please try again";
+        return F_NOT_FOUND;
+     }
+    teacher temp;
+    while(!readfile.eof()){
+		pos=readfile.tellg(); //replace object with null bytes
+        readfile.read((char*)&temp,sizeof(temp));
+			if(!strcmp(u,temp.getid())){
+            	flag=true;
+            	break;
+        	}
+    }
+	if(!flag){
+        cerr<<"\tInvalid user "<<endl;
+        return USN_NOT_FOUND;
+    	}
+    readfile.seekp(pos);
+    teacher del;
+    readfile.write((char*)&del,sizeof(teacher));
+	fflush(stdin);
+	cout<<"Staff  removed successfully...";
+	cin.get();
+	return SUCCESS;
+
+}
+
+int admin::manageAttendence(){
+    //have to work later
+    return 0;
+}
+
+int admin::listStudent(){
+    title();
+	char prev[12];
+	ifstream readF("student.bin",ios::binary|ios::in);
+	student temp;
+	fflush(stdin);
+	cout<<"\tUSN\t\tNAME"<<endl;
+    int full=0;
+    while(!readF.eof()){
+        readF.read((char*)&temp,sizeof(temp));
+		if(temp.admissionNo==-1){ cout<<endl<<"End of list";
+			break;
+		}
+		full++;
+		if(full>10){
+                cout<<"Press enter to continue...";
+                cin.get();
+                full=0;
+                title();
+                cout<<"\tUSN\t\tNAME"<<endl;
+               }
+        if(!strcmp(prev,temp.usn)) continue;
+        strcpy(prev,temp.usn);
+		cout<<"\t"<<temp.usn<<"\t"<<temp.name<<endl;
+
+    }
+	cout<<"\nPress any key to return...";
+	cin.get();
+	readF.close();
+}
+
+int admin::admitStudent(){
+    clrscr();
+	fstream putf("student.bin",ios::binary|ios::out|ios::app);
+	if(!putf){
+		cerr<<"Unable to open student record file ";
+		return F_NOT_FOUND;
+	}
+    student temp;
+    putf.seekp(ios::end);
+	title();
+	cout<<"Please enter the following fields...[all fields are mandatory]"<<endl;
+	fflush(stdin);
+	student t;
+    int status=0;
+    cout<<endl<<"_______________________________________________________________________________"<<endl;
+	cout<<"\n # Please enter usn number               : "; cin>>temp.usn;
+	fflush(stdin);
+	strupr(temp.usn);
+	if(USN_NOT_FOUND!=t.init(temp.usn)){
+		cout<<"This USN number is already assigned to : "<<t.name;
+		Sleep(1000);
+		if(++status<3)
+		admitStudent();
+		else return 0;
+	}
+	fflush(stdin);
+	cout<<"\n # Please enter full name of the student : "; cin.getline(temp.name,30);
+	fflush(stdin);
+	cout<<"\n # Please enter date of birth            : "; cin>>temp.dob;
+	fflush(stdin);
+	cout<<"\n # Please enter new admission number     : "; cin>>temp.admissionNo;
+	fflush(stdin);
+
+	fflush(stdin);
+	cout<<"\n # Please enter email id of the student  : "; cin>>temp.email;
+	fflush(stdin);
+	cout<<"\n # Please enter a password for the student: "; cin>>temp.pass;
+	strupr(temp.pass);
+	fflush(stdin);
+	cout<<"\n # Please enter which semester he is in    : "; cin>>temp.semester;
+	fflush(stdin);
+	cout<<"\n Enter teacher's department code (1.MCE, 2.EEE, 3.TVE, 4.CSE, 5.CEE,6.SWE,7.BTM) : "; cin>>temp.dept_id;
+	fflush(stdin);
+	cout<<"\n Press enter to proceed ";
+	cin.get();
+	clrscr();
+	title();
+	cout<<"\n The new student details are as given below... "<<endl;
+	cout<<endl<<"_______________________________________________________________________________"<<endl;
+
+	cout<<"\n # Admission Number       : "<<temp.admissionNo<<endl;
+	cout<<" # Student name           : "<<temp.name<<endl;
+	cout<<" # University Seat Number : "<<temp.usn<<endl;
+	cout<<" # Date of birth          : "<<temp.dob<<endl;
+	cout<<" # Email id               : "<<temp.email<<endl;
+	cout<<" # Password               : "<<temp.pass<<endl;
+	cout<<" # Semester               : "<<temp.semester<<endl;
+	cout<<" # Department ID          : "<<temp.dept_id<<endl;
+    memset(temp.marks.subject_info,-1,sizeof(temp.marks.subject_info));
+    memset(temp.attendence.subject_info,0,sizeof(temp.attendence.subject_info));
+    cout<<" Are the above details correct?  [Y/N] : ";
+	char yes;
+	cin.get(yes); fflush(stdin);
+	if(yes=='Y'||yes=='y') {
+
+		putf.write((char*)&temp,sizeof(temp));
+	cout<<"New student added successfully..."<<endl;
+	cin.get();
+	putf.close();
+	}
+	else {
+
+		cout<<" Student details weren't added ";
+		Sleep(800);
+		return -1;
+	}
+	clrscr();
+}
+
+int admin::update_teacher_info(char *u){
+
+    return 0;
+}
+
+int admin::update_subjects_info(){
+
+    return 0;
+}
+
+int admin::update_students_semester(){
+
+    return 0;
+}
+
 int student::init(char *u){
     bool flag=false;
     ifstream readfile("student.bin",ios::binary|ios::in);
@@ -549,8 +903,8 @@ int user_admin(){
         cout<<"\t\tMenu"<<endl;
         cout<<"_______________________________________________________________________________"<<endl;
         cout<<"\t\t1 : Admit student\n\t\t2 : Remove Student\n\t\t3 : Add Teacher\n\t\t4 : Remove Teacher\n\t\t5 : List Students\n\t\t6 : Manage attendance";
-        cout<<"\n\t\t7 : View student attendance\n\t\t8 : View student marks \n\t\t9 : Notifications \n\t\t10: Check Complaints \n\t\t11: Update Courses of Teachers \n\t\t12: Update Course Information  \n\t\t14: Update Students semester";
-        cout<<  "\n\t\t14: Show Admin Info  \n\t\t15: Exit"<<endl;
+        cout<<"\n\t\t7 : View student attendance\n\t\t8 : View student marks \n\t\t9 : Notifications \n\t\t10: Check Complaints \n\t\t11: Update Courses of Teachers \n\t\t12: Update Course Information  \n\t\t13: Update Students semester";
+        cout<<  "\n\t\t14: Set Exam Time\n\t\t15: Show Admin Info  \n\t\t16: Exit"<<endl;
         cout<<"_______________________________________________________________________________"<<endl;
         cout<<"\n\tEnter your choice  : ";
         int choice;
@@ -599,9 +953,12 @@ int user_admin(){
             case 13 :clrscr();
 		   		   	ad.update_students_semester();
 		   		   		break;
-            case 14 :
+            case 14 :clrscr();
+		   		   	ad.timetable();
+		   		   		break;
+            case 15 :
 					ad.showProfile();
-            case 15 :cout<<"Logging out...["<<id<<"]";
+            case 16 :cout<<"Logging out...["<<id<<"]";
 		   			Sleep(1000);
                     	return 0;
              default : cout<<"Select valid choice : ";
