@@ -116,6 +116,19 @@ public:
 		 int init(char*);
          int manageAttendence();
          int manageMarks();
+        void showProfile(){
+        clrscr();
+        title();
+        cout<<"Profile...."<<endl;
+        cout<<"_______________________________________________________________________________"<<endl;
+        cout<<" Staff Name      \t :"<<staff_name<<endl;
+        cout<<" Staff Id        \t :"<<staff_id<<endl;
+        cout<<" Email id        \t :"<<email<<endl;
+        cout<<" Department      \t :"<<department[dept_id] <<endl;
+        cout<<"_______________________________________________________________________________"<<endl;
+        fflush(stdin);
+        cin.get();
+        }
          friend class admin;
 
 };
@@ -869,8 +882,62 @@ int teacher::init(char *id){
 }
 
 int teacher::manageMarks(){
+    title();
+    int c=0;
+	int m;
+	student temp;
+	fstream readfile("student.bin",ios::binary|ios::in|ios::out);
+    if(!readfile.is_open()){
+		cout<<"Error : Student database file missing...";
+		return F_NOT_FOUND;
+	}
+	clrscr();
+	title();
+	int su;
+	cout<<endl<<"Enter the subject code you want to edit (must be consist of 4 digit) : ";
+	cin>>su;
+	int flag=0;
+	for(int i=0;i<total_course;i++){
+        if(course_code[i]==su){
+            flag=1;
+            break;
+        }
+	}
+	if(flag==0){
+        cout<<endl<<"You are not allowed to change marks of this course"<<endl;
+        return 0;
+	}
+	subject_no=(int)su%100;
+	su/=100;
+	semester_no=su%10;
+	dept_code=su/10;
+	cout<<endl<<"Now edit the marks of students who took the course "<<subject_array[dept_code][semester_no][subject_no] << "from the department " << department[dept_code] <<endl;
+    readfile.seekg(0);
+    while(!readfile.eof()){
+        fflush(stdin);
+        readfile.read((char*)&temp,sizeof(temp));
+        if(temp.dept_id==dept_code && temp.semester==semester_no && temp.marks.subject_info[semester_no][subject_no]!=-1){
+            int m;
+            cout<<temp.admissionNo << " :";
+            cin>>m;
+            temp.marks.subject_info[semester_no][subject_no]=m;
 
-    return 0;
+        }
+        readfile.seekp((long)readfile.tellg()-sizeof(temp));
+		readfile.write((char*)&temp,sizeof(temp));
+		c++;
+		if(c>15) {
+			clrscr();
+			title();
+    		c=0;
+		}
+		fflush(stdin);
+		cin.get();
+
+    }
+    cout<<" Marks have been updated succesfully..."; Sleep(3000);
+	return SUCCESS;
+
 }
 
 int teacher::manageAttendence(){
@@ -1038,7 +1105,7 @@ int user_teacher(){
 	teacher staf;
 	flag=staf.init(staffid);
 	 if(flag == USN_NOT_FOUND){
-		cout<<"\n\tNo such usn assigned to student... ";
+		cout<<"\n\tNo such usn assigned to teacher... ";
 		cin.get();
 		return 0;
 	}
