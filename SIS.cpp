@@ -12,7 +12,7 @@
 #define SUCCESS 0;
 //#difine ADM_PASS "DUNNO"
 using namespace std;
-int flag,subject=0,dept_code=0,semester_no=0;
+int flag,subject_no=0,dept_code=0,semester_no=0;
 
 char subject_info[9][10][20][50];
 
@@ -541,8 +541,51 @@ int admin::update_teacher_info(char *u){
 }
 
 int admin::update_subjects_info(){
+    clrscr();
+	fstream putf("subject_code.bin",ios::binary|ios::out);
+	if(!putf){
+		cerr<<"Unable to open subject record file ";
+		return F_NOT_FOUND;
+	}
+	//putf.seekp(ios::begin);
+	while(1){
+	title();
+    cout<<"Please enter the following fields...[all fields are mandatory]"<<endl;
+	fflush(stdin);
+	 int status=0;
+	 int temp_status;
+	 char sub[50];
+	cout<<endl<<"_______________________________________________________________________________"<<endl;
+	cout<<"\n # Please enter subject code(consist of 4 digit)               : "; cin>>status;
+	temp_status=status;
+	subject_no=(int)status%100;
+	status/=100;
+	semester_no=status%10;
+	status/=10;
+	dept_code=status;
+	fflush(stdin);
+	cout<<"\n # Please enter subject name                                   : "; cin>>sub;
+	strcpy(subject_info[dept_code][semester_no][subject_no],sub);
+	cout<<"\n Press enter to proceed ";
+	cin.get();
+	clrscr();
+	title();
+	cout<<"\n The new subject details are as given below... "<<endl;
+	cout<<"\n Course for dept "<< department[dept_code] << " in the semester "<<semester_no << " having code no "<<temp_status<<"\nCourse Name: "<<subject_info[dept_code][semester_no][subject_no] <<endl;
+	cout<<"New subject added successfully..."<<endl;
+	cin.get();
+	cout<<" \n Do you want to add more subject?  [Y/N] : ";
+	char yes;
+	cin.get(yes); fflush(stdin);
+	if(yes=='Y'||yes=='y')
+        continue;
+    else
+        break;
+	}
+	putf.write((char*)&subject_info,sizeof(subject_info));
+	putf.close();
+	clrscr();
 
-    return 0;
 }
 
 int admin::update_students_semester(){
@@ -970,8 +1013,16 @@ int user_admin(){
 	}
 
 };
+void setsubject(){
+    ifstream readF("subject_code.bin",ios::binary|ios::in);
+     readF.read((char*)&subject_info,sizeof(subject_info));
+     readF.close();
+
+}
 int main(){
     setdepartment();
+    setsubject();
+    //cout<<subject_info[4][3][1]<<endl;
     if(setup()) {
 		cout<<"Files are missing and unable to create new files...\n Please try again..."; Sleep(2000);
 		exit(1);
