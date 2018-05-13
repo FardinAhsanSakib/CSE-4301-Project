@@ -14,7 +14,7 @@
 using namespace std;
 int flag,subject_no=0,dept_code=0,semester_no=0;
 
-char subject_info[9][10][20][50];
+char subject_array[9][10][20][50];
 
 inline void clrscr(){
     system("cls");
@@ -159,7 +159,7 @@ class student{
     char email[30];
     char dob[11];
     struct sub{
-        int subject_info[10][20];
+        int subject_info[20][20];
     }marks,attendence;
 public:
     int semester;
@@ -601,13 +601,13 @@ int admin::update_subjects_info(){
 	dept_code=status;
 	fflush(stdin);
 	cout<<"\n # Please enter subject name                                   : "; cin>>sub;
-	strcpy(subject_info[dept_code][semester_no][subject_no],sub);
+	strcpy(subject_array[dept_code][semester_no][subject_no],sub);
 	cout<<"\n Press enter to proceed ";
 	cin.get();
 	clrscr();
 	title();
 	cout<<"\n The new subject details are as given below... "<<endl;
-	cout<<"\n Course for dept "<< department[dept_code] << " in the semester "<<semester_no << " having code no "<<temp_status<<"\nCourse Name: "<<subject_info[dept_code][semester_no][subject_no] <<endl;
+	cout<<"\n Course for dept "<< department[dept_code] << " in the semester "<<semester_no << " having code no "<<temp_status<<"\nCourse Name: "<<subject_array[dept_code][semester_no][subject_no] <<endl;
 	cout<<"New subject added successfully..."<<endl;
 	cin.get();
 	cout<<" \n Do you want to add more subject?  [Y/N] : ";
@@ -618,7 +618,7 @@ int admin::update_subjects_info(){
     else
         break;
 	}
-	putf.write((char*)&subject_info,sizeof(subject_info));
+	putf.write((char*)&subject_array,sizeof(subject_array));
 	putf.close();
 	clrscr();
 
@@ -651,6 +651,18 @@ int admin::update_students_semester(char *u){
     cout<<"\n Enter the student "<<u<<" current semester     : "; cin>>t;
 	fflush(stdin);
 	temp.semester=t;
+	int ct;
+	cout<<"\n How much course he is being offered in this semester ?    :";cin>>ct;
+    clrscr();
+	title();
+	cout<<"\n Enter the courses ID (must be of 4 digits)  :"<<endl;
+	int te;
+	for(int i=0;i<ct;i++){
+        cin>>te;
+        int code;
+        code=(int)te%100;
+        temp.marks.subject_info[temp.semester][code]=0;
+	}
 	readfile.seekp(pos);
 	readfile.write((char*)&temp,sizeof(temp));
 	fflush(stdin);
@@ -688,33 +700,82 @@ int student::init(char *u){
 }
 
 void student::showProfile(){
-        clrscr();
-	title();
-	cout<<"My profile...."<<endl;
+    clrscr();
+    title();
+    cout<<"My proifile...."<<endl;
 	cout<<endl<<"_______________________________________________________________________________"<<endl;
 	cout<<" Name                :"<<name<<endl;
-        cout<<" Admission number    :"<<admissionNo<<endl;
-        cout<<" USN                 :"<<usn<<endl;
-	cout<<" Dept ID             :"<<dept_id<<endl;
-        cout<<" Date of birth       :"<<dob<<endl;
-        cout<<" Email id            :"<<email<<endl;
-	cout<<endl<<"_______________________________________________________________________________"<<endl;
+    cout<<" Admission number    :"<<admissionNo<<endl;
+    cout<<" USN                 :"<<usn<<endl;
+    cout<<" Date of birth       :"<<dob<<endl;
+    cout<<" Email id            :"<<email<<endl;
+    cout<<" Department          :"<<department[dept_id] <<endl;
+    cout<<" Semester            :"<<semester<<endl;
+    cout<<endl<<"_______________________________________________________________________________"<<endl;
 	cout<<"Press any key to exit :";
 	cin.get();
 
 }
 
 void student::showMarks(){
+    clrscr();
+	title();
+	cout<<"\tWhat do you want? \t1.Result of a semester \t2.Result of particular course"<<endl;
+	int choice;
+	cin>>choice;
+    clrscr();
+	title();
+	if(choice==1){
+        cout<<"\n\tResult of which semester?"<<endl;
+        int st;
+        cin>>st;
+        clrscr();
+        title();
+        cout<<" Test Result     : "<<name<<endl;
+        cout<<endl<<"_______________________________________________________________________________"<<endl;
+        cout<<" COURSE NAME                          : MARKS "<<endl;
+        cout<<endl<<"_______________________________________________________________________________"<<endl;
+        for(int i=1;i<20;i++){
+            if(marks.subject_info[st][i]==-1)
+                continue;
+            else if(marks.subject_info[st][i]==0){
+                cout<< subject_array[dept_id][st][i] <<"              : "<<"Not Entered"<<endl;
+            }
+            else if(marks.subject_info[st][i]>0){
+                cout<< subject_array[dept_id][st][i] <<"              : "<<marks.subject_info[st][i]<<endl;
+            }
+        }
+        cout<<endl<<"_______________________________________________________________________________"<<endl;
+        cout<<"Press any key to exit :";
+        cin.get();
 
+	}
+	else if(choice==2){
+        int st;
+        cout<<"\n\tResult of which course?"<<endl;
+        cin>>st;
+        int ct;
+        ct=(int)st%100;
+        st=st/100;
+        st=st%10;
+        cout<<" Test Result     : "<<name<<endl;
+        cout<<endl<<"_______________________________________________________________________________"<<endl;
+        cout<<" COURSE NAME                          : MARKS "<<endl;
+        cout<<endl<<"_______________________________________________________________________________"<<endl;
+        cout<< subject_array[dept_id][st][ct] <<"              : "<<marks.subject_info[st][ct]<<endl;
+        cout<<endl<<"_______________________________________________________________________________"<<endl;
+        cout<<"Press any key to exit :";
+        cin.get();
+	}
 }
 
 void student::showAttendence(){
-
+ //it will be shown later
 }
 
 int student::Notification(){
 
-    clrscr();
+  clrscr();
 	char ch;
 
     ifstream readfile("notification.bin",ios::binary|ios::in);
@@ -737,17 +798,48 @@ int student::Notification(){
 }
 
 int student::timetable(){
-   clrscr();
+    clrscr();
 	char ch;
     ifstream readfile1("table.bin",ios::binary|ios::in);
     if(!readfile1.is_open()){
-              return F_NOT_FOUND;}
+              return F_NOT_FOUND;
+    }
+
+	title();
+	cout<<"\t\t\tExam Time Table\n";
+	readfile1.seekg(0);
+	cout<<"\n ";
+    while(!readfile1.eof()){
+    readfile1.get(ch);
+    cout<<ch;
+    }
+    cout<<"\n________________________________________________________________________ ";
+    cout<<"\nPress any key to return...";
+	cin.get();
+	readfile1.close();
 }
 
 
 char u1[11];
 int student::complaint(){
+    clrscr();
+    ofstream putf("complaint.bin",ios::binary|ios::out|ios::app);
+	if(!putf){
+		cerr<<"Unable to open student record file ";
+		return F_NOT_FOUND;
+	}
 
+	title();
+	char today[11],note[500];
+	getdate(today);
+	 cout<<"\t\t\t\t\t\t\t    Today : "<<today;
+	cout<<"\nEnter Complaint: \n";
+	fflush(stdin);
+	cin.getline(note,500);
+		putf<<"\n\n__________________________________________________________       "<<today<<"\n"<<note<<"\t -"<<u1<<"\n\n\n";
+
+	putf.close();
+	cout<<endl<<" Complaint given successfully..."; cin.get();
 }
 
 int teacher::init(char *id){
@@ -1120,7 +1212,7 @@ int user_admin(){
 };
 void setsubject(){
     ifstream readF("subject_code.bin",ios::binary|ios::in);
-     readF.read((char*)&subject_info,sizeof(subject_info));
+     readF.read((char*)&subject_array,sizeof(subject_array));
      readF.close();
 
 }
