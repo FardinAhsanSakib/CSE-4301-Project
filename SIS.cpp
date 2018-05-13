@@ -12,7 +12,7 @@
 #define SUCCESS 0;
 //#difine ADM_PASS "DUNNO"
 using namespace std;
-int flag,subject=0;
+int flag,subject=0,dept_code=0,semester_no=0;
 inline void clrscr(){
     system("cls");
 }
@@ -130,9 +130,9 @@ public:
             strcpy(email,_email);
         }
 
-    int addstaff();
+    int addTeacher();
     int admitStudent();
-    int removeStaff(char*);
+    int removeTeacher(char*);
     int removeStudent(char*);
     void viewMarks();
     void viewAttendence();
@@ -143,7 +143,8 @@ public:
     int timetable();
     void showProfile();
     int update_teacher_info(char *);
-    int update_subject();
+    int update_subjects_info();
+    int update_students_semester();
     friend int user_admin();
 
 
@@ -158,6 +159,7 @@ class student{
         int subject_info[10][20];
     }marks,attendence;
 public:
+    int semester;
     char pass[10];
     student(){
         admissionNo=-1;
@@ -167,6 +169,7 @@ public:
         strcpy(dob,"\0");
         memset(marks.subject_info,-1,sizeof(marks.subject_info));
         memset(attendence.subject_info,0,sizeof(attendence.subject_info));
+        semester=0;
     }
      int init(char*);
     void showProfile();
@@ -545,7 +548,68 @@ int user_admin(){
         cout<<"\tLogin type : Administrator  ["<<id<<"]"<<endl;
         cout<<"\t\tMenu"<<endl;
         cout<<"_______________________________________________________________________________"<<endl;
+        cout<<"\t\t1 : Admit student\n\t\t2 : Remove Student\n\t\t3 : Add Teacher\n\t\t4 : Remove Teacher\n\t\t5 : List Students\n\t\t6 : Manage attendance";
+        cout<<"\n\t\t7 : View student attendance\n\t\t8 : View student marks \n\t\t9 : Notifications \n\t\t10: Check Complaints \n\t\t11: Update Courses of Teachers \n\t\t12: Update Course Information  \n\t\t14: Update Students semester";
+        cout<<  "\n\t\t14: Show Admin Info  \n\t\t15: Exit"<<endl;
+        cout<<"_______________________________________________________________________________"<<endl;
+        cout<<"\n\tEnter your choice  : ";
+        int choice;
+        cin>>choice;
+        char s[5];
+        switch(choice){
+            case 1 : clrscr();
+		   			ad.admitStudent();
+		   				break;
+            case 2 : cout<<"\n\tEnter the valid USN : "; cin>>pass;
+					strupr(pass);
+                    ad.removeStudent(pass);
+		   				break;
+            case 3 : ad.addTeacher();
+		   				break;
+            case 4 :cout<<"\n\tEnter the staff id : "; cin>>pass;
+					strupr(pass);
+					ad.removeTeacher(pass);
+						break;
+            case 5 :clrscr();
+		   			ad.listStudent();
+                    	break;
+            case 6 :clrscr();
+		   			ad.manageAttendence();
+                    break;
+            case 7 :clrscr();
+		   			ad.viewAttendence();
+                    break;
+            case 8 :clrscr();
+		   			ad.viewMarks();
+                    break;
+            case 9 :clrscr();
+		   		   	ad.Notification();
+                    break;
+            case 10 :clrscr();
+		   		   	ad.complaint();
+                    break;
+            case 11 :clrscr();
+                    cout<<"\n\tEnter the teacher id : "; cin>>pass;
+					strupr(pass);
+		   		   	ad.update_teacher_info(pass);
+                    break;
+            case 12 :clrscr();
+		   		   	ad.update_subjects_info();
+		   		   		break;
+            case 13 :clrscr();
+		   		   	ad.update_students_semester();
+		   		   		break;
+            case 14 :
+					ad.showProfile();
+            case 15 :cout<<"Logging out...["<<id<<"]";
+		   			Sleep(1000);
+                    	return 0;
+             default : cout<<"Select valid choice : ";
+					Sleep(1000);
 
+
+
+        }
 	}
 
 };
