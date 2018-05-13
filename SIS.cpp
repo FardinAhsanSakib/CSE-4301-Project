@@ -688,6 +688,19 @@ int student::init(char *u){
 }
 
 void student::showProfile(){
+        clrscr();
+	title();
+	cout<<"My profile...."<<endl;
+	cout<<endl<<"_______________________________________________________________________________"<<endl;
+	cout<<" Name                :"<<name<<endl;
+        cout<<" Admission number    :"<<admissionNo<<endl;
+        cout<<" USN                 :"<<usn<<endl;
+	cout<<" Dept ID             :"<<dept_id<<endl;
+        cout<<" Date of birth       :"<<dob<<endl;
+        cout<<" Email id            :"<<email<<endl;
+	cout<<endl<<"_______________________________________________________________________________"<<endl;
+	cout<<"Press any key to exit :";
+	cin.get();
 
 }
 
