@@ -436,8 +436,84 @@ int admin::removeTeacher(char *u){
 }
 
 int admin::manageAttendence(){
-    //have to work later
-    return 0;
+            title();
+		   char tday[10],date[11];
+
+		   getdate(tday);
+		   cout<<"\t\t\t\t\t\t\t    Today : "<<tday;
+		   cout<<"\n\tYou have permission to change the attendence, only 6 days before the"<<endl;
+		   cout<<" final exam to give eligibilty to the student who has less than 75%."<<endl;
+		   cout<<endl<<"\n\nEnter the final exam date [DD/MM/YYYY] : ";
+		   cin>>date;
+		   int i,j,x,y;
+
+		   x=tday[3]-'0';
+		   x=x*10+(tday[4]-'0');
+		   y=date[3]-'0';
+		   y=y*10+(date[4]-'0');
+		   i=tday[0]-'0';
+		   i=i*10+(tday[1]-'0');
+		   j=date[0]-'0';
+		   j=j*10+(date[1]-'0');
+
+		   Sleep(1000);
+		   if(j-i<7&&x==y){
+                int su;
+                char u[20];
+                cout<<"Enter user no: ";
+                cin>>u;
+                cout<<"Enter subject code: ";
+                cin>>su;
+                subject_no=(int)su%100;
+                su/=100;
+                semester_no=su%10;
+                dept_code=su/10;
+                 bool flag=false;
+                long pos;
+                fstream readfile("student.bin",ios::binary|ios::in|ios::out);
+                if(!readfile){
+                cerr<<"Error in opening the file...please try again";
+                cin.get();
+                return F_NOT_FOUND;
+                }
+                student temp;
+                while(!readfile.eof()){
+                pos=readfile.tellg(); //replace object with null bytes
+                readfile.read((char*)&temp,sizeof(temp));
+                if(!strcmp(u,temp.usn)){
+            	flag=true;
+            	break;
+                }
+                }
+                 if(!flag){
+                cerr<<"\tInvalid user "<<endl;
+                return USN_NOT_FOUND;
+                cin.get();
+                }
+                cout<<" Attendence Result     : "<<temp.name<<endl;
+                cout<<endl<<"_________________________________________________________________________"<<endl;
+                cout<<" SUBJECT NAME                        : Class Attended "<<endl;
+                cout<<"_______________________________________________________________________________"<<endl;
+                cout<< subject_array[dept_code][semester_no][subject_no] <<"                 : "<<temp.attendence.subject_info[semester_no][subject_no]<<endl;
+                getchar();
+                cout<<"What the students attendance should be? :";
+                int f;
+                cin>>f;
+                temp.attendence.subject_info[semester_no][subject_no]=f;
+                readfile.seekp(pos);
+                readfile.write((char*)&temp,sizeof(temp));
+                fflush(stdin);
+                cout<<"Student record updated successfully...";
+                cin.get();
+                return SUCCESS;
+
+		   }
+		    else {
+			   cout<<"Sorry, You cannot change the attendance.";
+			   Sleep(800);
+		   return 0;
+		   }
+
 }
 
 int admin::listStudent(){
@@ -786,7 +862,24 @@ void student::showMarks(){
 }
 
 void student::showAttendence(){
- //it will be shown later
+    fflush(stdin);
+	clrscr();
+	title();
+    int su;
+    cout<<"\t Enter of your course code which attendance you want to check: ";
+    cin>>su;
+
+    subject_no=(int)su%100;
+	su/=100;
+	semester_no=su%10;
+	dept_code=su/10;
+	cout<<" Attendence Result     : "<<name<<endl;
+	cout<<endl<<"_________________________________________________________________________"<<endl;
+	cout<<" SUBJECT NAME                        : Class Attended "<<endl;
+    cout<<"_______________________________________________________________________________"<<endl;
+    cout<< subject_array[dept_code][semester_no][subject_no] <<"                 : "<<attendence.subject_info[semester_no][subject_no]<<endl;
+    getchar();
+	cout<<"Press any key to exit :"; cin.get();
 }
 
 int student::Notification(){
@@ -1401,5 +1494,7 @@ int main(){
 
         }
     }
+
+
 
 }
