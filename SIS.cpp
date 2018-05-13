@@ -147,7 +147,7 @@ public:
     void showProfile();
     int update_teacher_info(char *);
     int update_subjects_info();
-    int update_students_semester();
+    int update_students_semester(char *);
     friend int user_admin();
 
 
@@ -536,8 +536,44 @@ int admin::admitStudent(){
 }
 
 int admin::update_teacher_info(char *u){
-
-    return 0;
+    bool flag=false;
+	long pos;
+    fstream readfile("staff.bin",ios::binary|ios::in|ios::out);
+    if(!readfile){
+        cout<<"Error in opening the file...please try again";
+        cin.get();
+		return F_NOT_FOUND;
+     }
+     teacher temp;
+      while(!readfile.eof()){
+		pos=readfile.tellg(); //replace object with null bytes
+        readfile.read((char*)&temp,sizeof(temp));
+			if(!strcmp(u,temp.staff_id)){
+            	flag=true;
+            	break;
+        	}
+    }
+    if(!flag){
+        cout<<"\tInvalid user "<<endl;
+        return USN_NOT_FOUND;
+		cin.get();
+    }
+    int t;
+    cout<<"\n Enter the teacher "<<u<<" current total course   : "; cin>>t;
+	fflush(stdin);
+	temp.total_course=t;
+	int temp_c;
+    cout<<"\n Enter his courses id(must be consist of 4 digits)   : ";
+	for(int i=0;i<t;i++){
+        scanf("%d",&temp_c);
+        temp.course_code[i]=temp_c;
+	}
+	readfile.seekp(pos);
+	readfile.write((char*)&temp,sizeof(temp));
+	fflush(stdin);
+	cout<<"Teachers courses record updated successfully...";
+	cin.get();
+	return SUCCESS;
 }
 
 int admin::update_subjects_info(){
@@ -588,9 +624,40 @@ int admin::update_subjects_info(){
 
 }
 
-int admin::update_students_semester(){
+int admin::update_students_semester(char *u){
+    bool flag=false;
+	long pos;
+	 fstream readfile("student.bin",ios::binary|ios::in|ios::out);
+	if(!readfile){
+        cerr<<"Error in opening the file...please try again";
+        cin.get();
+		return F_NOT_FOUND;
+     }
+    student temp;
+    while(!readfile.eof()){
+		pos=readfile.tellg(); //replace object with null bytes
+        readfile.read((char*)&temp,sizeof(temp));
+			if(!strcmp(u,temp.usn)){
+            	flag=true;
+            	break;
+        	}
+    }
+    if(!flag){
+        cerr<<"\tInvalid user "<<endl;
+        return USN_NOT_FOUND;
+		cin.get();
+    }
+    int t;
+    cout<<"\n Enter the student "<<u<<" current semester     : "; cin>>t;
+	fflush(stdin);
+	temp.semester=t;
+	readfile.seekp(pos);
+	readfile.write((char*)&temp,sizeof(temp));
+	fflush(stdin);
+	cout<<"Student record updated successfully...";
+	cin.get();
+	return SUCCESS;
 
-    return 0;
 }
 
 int student::init(char *u){
@@ -994,7 +1061,9 @@ int user_admin(){
 		   		   	ad.update_subjects_info();
 		   		   		break;
             case 13 :clrscr();
-		   		   	ad.update_students_semester();
+                    cout<<"\n\tEnter the valid USN : "; cin>>pass;
+					strupr(pass);
+		   		   	ad.update_students_semester(pass);
 		   		   		break;
             case 14 :clrscr();
 		   		   	ad.timetable();
