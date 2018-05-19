@@ -1,0 +1,38 @@
+#include<stdio.h>
+#include<SQLAPI.h>         
+ 
+int main(int argc, char* argv[])
+{
+    
+    SAConnection con;
+    try
+    {
+        
+        con.Connect ("XE",    // database name
+                     "FARDIN",  // user name
+                     "IUT123",  // password
+                     SA_Oracle_Client); 
+        cout << "disconnected";
+ 
+        
+        
+        con.Disconnect();
+        cout << "disconnected";
+    }
+ 
+    catch(SAException &amp; x)
+    {
+       
+        try
+        {
+            
+            con.Rollback ();
+        }
+        catch(SAException &amp;)
+        {
+        }
+        
+        cout << "Error";
+    }
+    return 0;
+}
