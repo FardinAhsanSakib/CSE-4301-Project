@@ -1,38 +1,49 @@
 #include<stdio.h>
 #include<SQLAPI.h>         
  
+#include<stdio.h>
+#include <SQLAPI.h> 
 int main(int argc, char* argv[])
 {
-    
-    SAConnection con;
+    SAConnection con; 
+    SACommandcmd;    
     try
     {
         
-        con.Connect ("XE",    // database name
-                     "FARDIN",  // user name
-                     "IUT123",  // password
-                     SA_Oracle_Client); 
-        cout << "disconnected";
+        con.Connect("XE", "FARDIN", "IUT123", SA_Oracle_Client);
+ 
+       
+        cmd.setConnection(&con);
  
         
-        
-        con.Disconnect();
-        cout << "disconnected";
+        cmd.setCommandText("create table student(id number, name varchar(20));");
+        cmd.Execute();
+ 
+       
+        cmd.setCommandText("Insert into student(id, name) values (1,”Habib”)");
+        cmd.setCommandText("Insert into student(id, name) values (2,”Sabik”)");
+        cmd.setCommandText("Insert into student(id, name) values (3,”Rezaul”)");
+        cmd.Execute();
+ 
+      
+        con.Commit();
+       
     }
  
-    catch(SAException &amp; x)
+    catch(SAException &x)
     {
-       
+        
         try
         {
             
-            con.Rollback ();
+            con.Rollback();
         }
-        catch(SAException &amp;)
+        catch(SAException &)
         {
         }
         
-        cout << "Error";
+ 
+        cout << "ERROR";
     }
     return 0;
 }
