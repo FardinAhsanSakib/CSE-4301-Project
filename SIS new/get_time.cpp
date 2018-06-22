@@ -7,6 +7,7 @@
 #include<time.h>
 #include<windows.h>
 #include<string>
+#include"get_time.h"
 
 using namespace std;
 
