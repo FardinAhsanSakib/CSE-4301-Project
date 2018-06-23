@@ -12,3 +12,4 @@
 using namespace std;
 
 void title();
+void clrscr();
