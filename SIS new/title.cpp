@@ -12,10 +12,13 @@
 using namespace std;
 
 
-void title(){
+void title::title(){
     clrscr();
 	cout<<"==============================================================================="<<endl;
 	cout<<"**************           Student Information System           *****************"<<endl;
 	cout<<"**************      Islamic University of Technology (IUT)    *****************"<<endl;
 	cout<<"==============================================================================="<<endl;
+}
+void title::clrscr(){
+    system("cls");
 }
