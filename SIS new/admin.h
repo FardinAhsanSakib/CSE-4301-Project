@@ -36,9 +36,8 @@ public:
     int complaint();
     int timetable();
     void showProfile();
-    int update_teacher_info(char *);
-    int update_subjects_info();
-    int update_students_semester(char *);
+   void update_subjects_info();
+    void update_students_semester();
     friend int user_admin();
 
 
