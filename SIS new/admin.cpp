@@ -694,7 +694,7 @@ void admin::update_students_semester(){
 
 		cmd.setCommandText("update student set semester=:1 where id=:2");
 		cmd.Param(1).setAsLong() = b;
-		cmd.Param(1).setAsLong() = stid[i];
+		cmd.Param(2).setAsLong() = stid[i];
 
 		cmd.Execute();
 		cout << "\nsemester updated successfully for "<<stid[i] << "\n";
