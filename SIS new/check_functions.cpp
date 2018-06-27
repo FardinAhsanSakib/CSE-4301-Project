@@ -170,5 +170,56 @@ string check_functions::check_student(int _id)
 		return 0;
 	}
 }
+int check_attendance(int _stuid,int _course,string _b){
+    int to_return;
+    SAConnection con;
 
+	try
+	{
+		// connect to database
+		con.Connect(
+			"XE",     // database name
+			"cpp_proj",   // user name
+			"test123",   // password
+			SA_Oracle_Client);
+		SACommand cmd(&con);
+
+		cmd.setCommandText("select attend from marks_attendance where scode= :1 and aca_year= :2 and sid= :3"); // set command for selection
+		cmd.Param(1).setAsLong() = _course;
+		cmd.Param(2).setAsString() = b.c_str();
+		cmd.Param(3).setAsLong() = _stuid;
+		cmd.Execute();
+
+		// check if result exists
+		bool isResult = cmd.isResultSet();
+		if (!isResult)
+		{
+			cout << "No result exists\n";
+			return;
+		}
+		else
+		{
+			while (cmd.FetchNext())
+			{
+				to_return=cmd[1].asLong();
+			}
+		}
+	}
+	catch (SAException &x)
+	{
+		// SAConnection::Rollback()
+		try
+		{
+			// on error rollback changes
+			cout << "rolling back.....";
+			con.Rollback();
+		}
+		catch (SAException &)
+		{
+		}
+		// print error message
+		printf("%s\n", (const char*)x.ErrText());
+	}
+    return to_return;
+}
 
