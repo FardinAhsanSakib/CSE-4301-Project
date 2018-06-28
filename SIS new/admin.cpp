@@ -826,16 +826,6 @@ void admin::update_students_semester(){
 }
 
 
-void admin::viewMarks(){
-
-}
-void admin::viewAttendence(){
-
-}
-void admin::manageAttendence(){
-
-}
-
 
 
 
