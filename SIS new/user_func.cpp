@@ -42,7 +42,7 @@ int user_func::user_admin(){
     if(pass!=true_pass){
         cout<<"\n\tInvalid Password or Admin ID ... ";
 		cin.get();
-		return 0;
+		return -1;
     }
     int _idh;
     int _courseh;
@@ -142,7 +142,7 @@ int user_func::user_student(){
     if(pass!=true_pass){
         cout<<"\n\tInvalid Password or Student ID ... ";
 		cin.get();
-		return 0;
+		return -1;
     }
        while(1) {
         clrscr();
@@ -155,7 +155,7 @@ int user_func::user_student(){
        	switch(choice){
            case 1 : fflush(stdin);
 		   			clrscr();
-		   			s.showProfile();
+		   			showProfile(_id);
                     break;
            case 2 : fflush(stdin);
                     clrscr();
@@ -202,7 +202,7 @@ int user_func::user_teacher(){
     if(pass!=true_pass){
         cout<<"\n\tInvalid Password or Teacher ID ... ";
 		cin.get();
-		return 0;
+		return -1;
     }
         while(1){
         clrscr();
