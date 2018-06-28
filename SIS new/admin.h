@@ -28,14 +28,9 @@ public:
     void admitStudent();
     void removeTeacher();
     void removeStudent();
-    void viewMarks();
-    void viewAttendence();
-    void manageAttendence();
     void listStudent();
     int Notification();
-    int complaint();
-    int timetable();
-    void showProfile();
+    void showprofile();
    void update_subjects_info();
     void update_students_semester();
     friend int user_admin();
