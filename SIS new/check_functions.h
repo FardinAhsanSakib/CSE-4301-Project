@@ -13,3 +13,4 @@ string check_admin(int );
 string check_teacher(int );
 string check_student(int );
 int check_attendance(int _stuid,int _course,string _b);
+int check_edit(int _id,int _course);
