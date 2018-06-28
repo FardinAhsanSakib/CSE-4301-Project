@@ -222,4 +222,56 @@ int check_attendance(int _stuid,int _course,string _b){
 	}
     return to_return;
 }
+int check_functions::check_edit(int _id,int _course)
+{
+	SAConnection con;
+	try
+	{
+		// connect to database
+		con.Connect(
+			"XE",     // database name
+			"cpp_proj",   // user name
+			"test123",   // password
+			SA_Oracle_Client);
+		SACommand cmd(&con);
+
+		// check if admin exists and return password
+		// prototype: check_admin(ad_name in varchar2, passwd out varchar2)
+		cmd.setCommandText("check_edit");
+		cmd.Param(1).setAsLong() = _id; // pass parameters
+        cmd.Param(2).setAsLong() = _course;
+		cmd.Execute();
+
+		// get the pass from the check procedure if admin exists
+		// procedure will return "not found" if admin doesn't exist
+		string pass = string(cmd.Param("passwd").asString());
+
+		if (pass == "not found")
+		{
+			con.Disconnect(); // disconnect before return
+			return 0;
+		}
+		else
+		{
+			con.Disconnect();
+			return 1;
+		}
+	}
+	catch (SAException &x)
+	{
+		// SAConnection::Rollback()
+		try
+		{
+			// on error rollback changes
+			cout << "rolling back.....";
+			con.Rollback();
+		}
+		catch (SAException &)
+		{
+		}
+		// print error message
+		printf("%s\n", (const char*)x.ErrText());
+		return 0;
+	}
+}
 
