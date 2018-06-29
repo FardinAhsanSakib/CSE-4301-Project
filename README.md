@@ -2,7 +2,7 @@
 A Student Information Management System using C++.
 
 ## Project Team Members:
-1.Fardin Ahsan (160041059) 
+1.Fardin Ahsan Sakib (160041059) 
 Github: fardin160041059
 
 2.Md. Mumtahin Habib Ullah Mazumder (160041066) 
